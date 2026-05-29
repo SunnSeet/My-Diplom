@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестирование API - SUNNSET</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0F0E0E;
+            color: #FFFFFF;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #FF4343;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .api-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .api-card h3 {
+            color: #FF4343;
+            margin-bottom: 15px;
+        }
+
+        .endpoint {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .method.get {
+            background: #4caf50;
+        }
+
+        .method.post {
+            background: #2196f3;
+        }
+
+        .method.put {
+            background: #ff9800;
+        }
+
+        .method.delete {
+            background: #f44336;
+        }
+
+        button {
+            background: #740000;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #941607;
+        }
+
+        pre {
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .response-area {
+            margin-top: 10px;
+        }
+
+        .status {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .status.success {
+            color: #4caf50;
+        }
+
+        .status.error {
+            color: #f44336;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔌 SUNNSET API Тестирование</h1>
+    <div class="container">
+
+        <!-- Товары -->
+        <div class="api-card">
+            <h3>📦 Товары</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/products
+            </div>
+            <button onclick="testAPI('GET', 'products')">Получить все товары</button>
+
+            <div class="endpoint" style="margin-top: 15px;">
+                <span class="method get">GET</span> /api/products/1
+            </div>
+            <button onclick="testAPI('GET', 'products/1')">Получить товар ID=1</button>
+
+            <div id="products-response" class="response-area"></div>
+        </div>
+
+        <!-- Категории -->
+        <div class="api-card">
+            <h3>🏷️ Категории</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/categories
+            </div>
+            <button onclick="testAPI('GET', 'categories')">Получить категории</button>
+            <div id="categories-response" class="response-area"></div>
+        </div>
+
+        <!-- Корзина -->
+        <div class="api-card">
+            <h3>🛒 Корзина</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/cart
+            </div>
+            <button onclick="testAPI('GET', 'cart')">Получить корзину</button>
+
+            <div class="endpoint" style="margin-top: 15px;">
+                <span class="method post">POST</span> /api/cart
+            </div>
+            <button onclick="testAPI('POST', 'cart', {product_id: 1, quantity: 1})">Добавить товар ID=1</button>
+
+            <div id="cart-response" class="response-area"></div>
+        </div>
+
+        <!-- Заказы -->
+        <div class="api-card">
+            <h3>📋 Заказы</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/orders
+            </div>
+            <button onclick="testAPI('GET', 'orders')">Получить заказы</button>
+
+            <div class="endpoint" style="margin-top: 15px;">
+                <span class="method post">POST</span> /api/orders
+            </div>
+            <button
+                onclick="testAPI('POST', 'orders', {address: 'Москва, ул. Тестовая, д.1', phone: '+7(999)999-99-99'})">
+                Создать заказ
+            </button>
+
+            <div id="orders-response" class="response-area"></div>
+        </div>
+
+        <!-- Авторизация -->
+        <div class="api-card">
+            <h3>🔐 Авторизация</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/auth/login
+            </div>
+            <input type="text" id="login-username" placeholder="Никнейм или Email"
+                style="width: 100%; margin-bottom: 5px; background: #1a1a1a; border: 1px solid #333; color: white; padding: 5px;">
+            <input type="password" id="login-password" placeholder="Пароль"
+                style="width: 100%; margin-bottom: 10px; background: #1a1a1a; border: 1px solid #333; color: white; padding: 5px;">
+            <button onclick="testLogin()">Войти</button>
+
+            <div id="auth-response" class="response-area"></div>
+        </div>
+
+        <!-- Профиль -->
+        <div class="api-card">
+            <h3>👤 Профиль</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/user/profile
+            </div>
+            <button onclick="testAPI('GET', 'user/profile')">Получить профиль</button>
+
+            <div id="profile-response" class="response-area"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const API_BASE = '/diplom/api/';
+        let apiToken = localStorage.getItem('api_token') || '';
+
+        async function testAPI(method, endpoint, body = null) {
+            const url = API_BASE + endpoint;
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': 'sunnset_api_key_2025_secure'
+                }
+            };
+
+            if (apiToken) {
+                options.headers['Authorization'] = `Bearer ${apiToken}`;
+            }
+
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            const responseAreaId = endpoint.split('/')[0] + '-response';
+            const responseArea = document.getElementById(responseAreaId) ||
+                document.getElementById(endpoint.split('/')[0] + '-response');
+
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+
+                const statusClass = response.ok ? 'success' : 'error';
+                const statusText = response.ok ? '✅ Успешно' : '❌ Ошибка';
+
+                responseArea.innerHTML = `
+                    <div class="status ${statusClass}">${statusText} (${response.status})</div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+
+                // Если получили токен при входе
+                if (endpoint === 'auth/login' && data.success && data.token) {
+                    apiToken = data.token;
+                    localStorage.setItem('api_token', apiToken);
+                    document.getElementById('auth-response').innerHTML += '<div style="color: #4caf50; margin-top: 5px;">🔑 Токен сохранен</div>';
+                }
+            } catch (error) {
+                responseArea.innerHTML = `
+                    <div class="status error">❌ Ошибка запроса</div>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+
+        function testLogin() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            if (!username || !password) {
+                document.getElementById('auth-response').innerHTML = `
+                    <div class="status error">❌ Введите никнейм и пароль</div>
+                `;
+                return;
+            }
+
+            testAPI('POST', 'auth/login', { username: username, password: password });
+        }
+
+        // Пример использования API в коде
+        async function exampleAPICall() {
+            // Получение товаров
+            const products = await fetch('/diplom/api/products', {
+                headers: { 'X-API-Key': 'sunnset_api_key_2025_secure' }
+            }).then(res => res.json());
+            console.log('Товары:', products);
+
+            // Добавление в корзину
+            const cart = await fetch('/diplom/api/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': 'sunnset_api_key_2025_secure'
+                },
+                body: JSON.stringify({ product_id: 1, quantity: 2 })
+            }).then(res => res.json());
+            console.log('Корзина:', cart);
+        }
+    </script>
+</body>
+
+</html>
