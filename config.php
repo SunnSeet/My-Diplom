@@ -1,31 +1,31 @@
 <?php
 session_start();
 
-// $max_requests = 30;      // максимум запросов
-// $time_window = 60;       // за 60 секунд
+$max_requests = 30;      // максимум запросов
+$time_window = 60;       // за 60 секунд
 
-// if (!isset($_SESSION['requests'])) {
-//     $_SESSION['requests'] = [];
-// }
+if (!isset($_SESSION['requests'])) {
+    $_SESSION['requests'] = [];
+}
 
-// $current_time = time();
+$current_time = time();
 
-// // Удаляем старые записи (старше $time_window секунд)
-// $_SESSION['requests'] = array_filter(
-//     $_SESSION['requests'],
-//     function ($timestamp) use ($current_time, $time_window) {
-//         return ($current_time - $timestamp) < $time_window;
-//     }
-// );
+// Удаляем старые записи
+$_SESSION['requests'] = array_filter(
+    $_SESSION['requests'],
+    function ($timestamp) use ($current_time, $time_window) {
+        return ($current_time - $timestamp) < $time_window;
+    }
+);
 
-// // Если превышен лимит — блокируем
-// if (count($_SESSION['requests']) >= $max_requests) {
-//     http_response_code(429);
-//     die('⚠️ Слишком много запросов. Подождите немного.');
-// }
+// превышен лимит — блокируем
+if (count($_SESSION['requests']) >= $max_requests) {
+    http_response_code(429);
+    die('⚠️ Слишком много запросов. Подождите немного.');
+}
 
-// // Добавляем текущий запрос
-// $_SESSION['requests'][] = $current_time;
+// Добавляем текущий запрос
+$_SESSION['requests'][] = $current_time;
 
 $host = 'localhost';
 $dbname = 'sunset_shop';
